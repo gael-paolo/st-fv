@@ -73,7 +73,15 @@ if archivo_u and archivo_dic and archivo_sald:
     U = pd.merge(U, Sald, on=['Ciudad', 'FAMILIA_FV'], how='left')
     U['Comp_Saldo'] = U['Pct_Comp'] * U['Saldo']
     U.drop(columns=['Pct_Comp', 'Saldo'], inplace=True)
-    
+    df_viz = pd.pivot_table(U, values='Comp_Saldo', index = ['Ciudad', 'FAMILIA_FV'], columns='Rango', aggfunc='sum')
+    df_viz = df_viz.fillna(0)
+    cols_format = ['<60', '<90', '>90']
+    for col in cols_format:
+        df_viz[col] = df_viz[col].apply(lambda x: '{:,.2f}'.format(x))
+
+    st.write("El análisis de stock presenta el siguiente resultado:")
+    st.dataframe(df_viz)
+
     # Stock General
     FV_VN_1 = pd.merge(Dic_VN_COD, Sald, on=['Ciudad','FAMILIA_FV'], how='inner')[['COD_FV', 'Saldo']]
     
@@ -150,6 +158,16 @@ if archivo_u221 and archivo_u257 and archivo_sald_rep:
     Stock['Comp_Saldo'] = Stock['Pct_Comp'] * Stock['Saldo']
     Stock.drop(columns=['Saldo', 'Pct_Comp'], inplace=True)
     Sald_Rep.rename(columns={'Grupo_Contable':'FAMILIA_FV'}, inplace = True)
+    
+    df_viz = pd.pivot_table(Stock, values='Comp_Saldo', index = ['Ciudad', 'Grupo_Contable'], columns='Rango', aggfunc='sum')
+    df_viz = df_viz.fillna(0)
+    df_viz = df_viz[['<90', '<180', '<360', '>360']]
+    cols_format = ['<90', '<180', '<360', '>360']
+    for col in cols_format:
+        df_viz[col] = df_viz[col].apply(lambda x: '{:,.2f}'.format(x))
+    
+    st.write("El análisis de stock presenta el siguiente resultado:")
+    st.dataframe(df_viz)
 
     Compra.rename(columns={'Tot.compra': 'Saldo', 'Almacé': 'Alm'}, inplace = True)
     Compra = Compra[Compra['T.compr'].isin(['1', '2'])]
