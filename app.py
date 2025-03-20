@@ -75,9 +75,17 @@ if archivo_u and archivo_dic and archivo_sald:
     U.drop(columns=['Pct_Comp', 'Saldo'], inplace=True)
     df_viz = pd.pivot_table(U, values='Comp_Saldo', index = ['Ciudad', 'FAMILIA_FV'], columns='Rango', aggfunc='sum')
     df_viz = df_viz.fillna(0)
-    cols_format = ['<60', '<90', '>90']
-    for col in cols_format:
+    
+    expected_columns = ['<30', '<60', '<90', '>90']
+
+    for col in expected_columns:
+        if col not in df_viz.columns:
+            df_viz[col] = 0
+    
+    for col in expected_columns:
         df_viz[col] = df_viz[col].apply(lambda x: '{:,.2f}'.format(x))
+    
+    df_viz = df_viz[expected_columns]
 
     st.write("El análisis de stock presenta el siguiente resultado:")
     st.dataframe(df_viz)
@@ -161,11 +169,18 @@ if archivo_u221 and archivo_u257 and archivo_sald_rep:
     
     df_viz = pd.pivot_table(Stock, values='Comp_Saldo', index = ['Ciudad', 'Grupo_Contable'], columns='Rango', aggfunc='sum')
     df_viz = df_viz.fillna(0)
-    df_viz = df_viz[['<90', '<180', '<360', '>360']]
-    cols_format = ['<90', '<180', '<360', '>360']
-    for col in cols_format:
-        df_viz[col] = df_viz[col].apply(lambda x: '{:,.2f}'.format(x))
     
+    expected_columns = ['<90', '<180', '<360', '>360']
+
+    for col in expected_columns:
+        if col not in df_viz.columns:
+            df_viz[col] = 0
+
+    df_viz = df_viz[expected_columns]
+
+    for col in expected_columns:
+        df_viz[col] = df_viz[col].apply(lambda x: '{:,.2f}'.format(x))
+
     st.write("El análisis de stock presenta el siguiente resultado:")
     st.dataframe(df_viz)
 
@@ -196,6 +211,5 @@ if archivo_u221 and archivo_u257 and archivo_sald_rep:
     # Botón para descargar CSV
     csv = FV_Parts_Report.to_csv(index=False).encode('utf-8')
     st.download_button(label="Descargar Reporte", data=csv, file_name="FV_Parts_Report.csv", mime='text/csv')
-
-
+    
     st.dataframe(FV_Parts_Report)
