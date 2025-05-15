@@ -185,6 +185,8 @@ if archivo_u221 and archivo_u257 and archivo_sald_rep:
     st.dataframe(df_viz)
 
     Compra.rename(columns={'Tot.compra': 'Saldo', 'Almacé': 'Alm'}, inplace = True)
+    Compra['Alm'] = Compra['Alm'].astype(str)
+    Dic_ALM['Alm'] = Dic_ALM['Alm'].astype(str)
     Compra = Compra[Compra['T.compr'].isin(['1', '2'])]
     Compra['Saldo'] = pd.to_numeric(Compra['Saldo'], errors='coerce').fillna(0)
     Compra = Compra[['Alm', 'Familia', 'Saldo']]
